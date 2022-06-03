@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Image,
@@ -7,10 +7,23 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
+  Alert,
 } from "react-native";
 import { Formik } from "formik";
 import { Octicons, Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
+import SQLite from "react-native-sqlite-storage";
+
+const db = SQLite.openDatabase(
+  {
+    name: "Login_db",
+    location: "default",
+  },
+  () => {},
+  (error) => {
+    console.log(error);
+  }
+);
 
 import { useTogglePasswordVisibility } from "./useTogglePasswordVisibility";
 
@@ -18,8 +31,56 @@ const Login = () => {
   const { passwordVisibility, handlePasswordVisibility, rightIcon } =
     useTogglePasswordVisibility();
   const [isSelected, setSelection] = React.useState(false);
-  const [password, setPassword] = React.useState(false);
+  const [password, setPassword] = React.useState("");
   const [username, setUsername] = React.useState("");
+
+  useEffect(() => {
+    createTable();
+    getData();
+  }, []);
+
+  const createTable = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS" +
+          "Users" +
+          "(ID INTEGER PRIMARY KEY AUTOINCREMENT, Username TEXT, Password TEXT);"
+      );
+    });
+  };
+
+  const getData = () => {
+    try {
+      db.transaction((tx) => {
+        tx.executeSql("SELECT Name, Password FROM Users", [], (tx, results) => {
+          var len = results.rows.length;
+          if (len > 0) {
+            navigation.navigate("Home");
+          }
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const setData = async () => {
+    if (username.length == 0 || password.length == 0) {
+      Alert.alert("Warning!", "Please write your data.");
+    } else {
+      try {
+        await db.transaction(async (tx) => {
+          await tx.executeSql("INSERT INTO Users (Name, Age) VALUES (?,?)", [
+            name,
+            age,
+          ]);
+        });
+        navigation.navigate("Home");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <View
@@ -78,15 +139,47 @@ const Login = () => {
         }}
         source={require("./../assets/logo_login.png")}
       />
-      <>
-        <Formik
-          initialValues={{ username: "", password: "" }}
-          onSubmit={(value) => {
-            console.log(value);
-          }}
-        >
-          {({ values, handleChange, handleBlur, handleSubmit }) => (
-            <View style={{ width: "100%" }} onSubmit={handleSubmit}>
+      <Formik
+        initialValues={{ username: "", password: "" }}
+        onSubmit={() => {
+          console.log(`username: ${username} password :${password}`);
+        }}
+      >
+        {({ values, handleChange, handleBlur, handleSubmit }) => (
+          <View style={{ width: "100%" }} onSubmit={handleSubmit}>
+            <TextInput
+              style={{
+                height: 50,
+                margin: 12,
+                borderWidth: 1,
+                padding: 10,
+                top: 220,
+                borderRadius: 5,
+                borderColor: "orange",
+                backgroundColor: "white",
+                textAlign: "center",
+              }}
+              type="username"
+              name="username"
+              onChangeText={(text) => setUsername(text)}
+              //onBlur={handleBlur("username")}
+              placeholder="Username"
+              //value={values.username}
+            />
+
+            <View>
+              <Octicons
+                name="person"
+                style={{
+                  position: "absolute",
+                  left: 25,
+                  top: 173,
+                  fontSize: 20,
+                }}
+              ></Octicons>
+            </View>
+
+            <View>
               <TextInput
                 style={{
                   height: 50,
@@ -99,98 +192,72 @@ const Login = () => {
                   backgroundColor: "white",
                   textAlign: "center",
                 }}
-                type="username"
-                name="username"
-                onChange={(text) => setUsername(text)}
-                onBlur={handleBlur("username")}
-                placeholder="Username"
-                value={values.username}
+                name="password"
+                placeholder="Password"
+                autoCapitalize="none"
+                autoCorrect={false}
+                textContentType="newPassword"
+                secureTextEntry={passwordVisibility}
+                //value={values.password}
+                enablesReturnKeyAutomatically
+                onChangeText={(text) => setPassword(text)}
               />
-
-              <View>
-                <Octicons
-                  name="person"
-                  style={{
-                    position: "absolute",
-                    left: 25,
-                    top: 173,
-                    fontSize: 20,
-                  }}
-                ></Octicons>
-              </View>
-
-              <View>
-                <TextInput
-                  style={{
-                    height: 50,
-                    margin: 12,
-                    borderWidth: 1,
-                    padding: 10,
-                    top: 220,
-                    borderRadius: 5,
-                    borderColor: "orange",
-                    backgroundColor: "white",
-                    textAlign: "center",
-                  }}
-                  name="password"
-                  placeholder="Password"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  textContentType="newPassword"
-                  secureTextEntry={passwordVisibility}
-                  value={values.password}
-                  enablesReturnKeyAutomatically
-                  onChangeText={(text) => setPassword(text)}
+              <Pressable onPress={handlePasswordVisibility}>
+                <Ionicons
+                  name={rightIcon}
+                  size={22}
+                  color="#232323"
+                  style={{ position: "absolute", top: 170, right: 25 }}
                 />
-                <Pressable onPress={handlePasswordVisibility}>
-                  <Ionicons
-                    name={rightIcon}
-                    size={22}
-                    color="#232323"
-                    style={{ position: "absolute", top: 170, right: 25 }}
-                  />
-                </Pressable>
-              </View>
-
-              <View>
-                <Octicons
-                  name="lock"
-                  style={{
-                    position: "absolute",
-                    left: 25,
-                    top: 170,
-                    fontSize: 20,
-                  }}
-                ></Octicons>
-              </View>
-
-              <View style={{ position: "absolute", top: "625%", left: 5 }}>
-                <Checkbox
-                  style={{ margin: 8 }}
-                  value={isSelected}
-                  onValueChange={setSelection}
-                />
-                <Text
-                  style={{
-                    position: "relative",
-                    left: 35,
-                    bottom: "50%",
-                    textAlign: "center",
-                  }}
-                >
-                  Remember me
-                </Text>
-              </View>
-
-              <TouchableOpacity onPress={handleSubmit} style={styles.button}>
-                <Text style={{ textAlign: "center", paddingVertical: 14 }}>
-                  Login
-                </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
-          )}
-        </Formik>
-      </>
+
+            <View>
+              <Octicons
+                name="lock"
+                style={{
+                  position: "absolute",
+                  left: 25,
+                  top: 170,
+                  fontSize: 20,
+                }}
+              ></Octicons>
+            </View>
+
+            <View style={{ position: "absolute", top: "625%", left: 5 }}>
+              <Checkbox
+                style={{ margin: 8 }}
+                value={isSelected}
+                onValueChange={setSelection}
+              />
+              <Text
+                style={{
+                  position: "relative",
+                  left: 35,
+                  bottom: "50%",
+                  textAlign: "center",
+                }}
+              >
+                Remember me
+              </Text>
+            </View>
+
+            <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+              <Text style={{ textAlign: "center", paddingVertical: 14 }}>
+                Login
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </Formik>
+      <View style={{ position: "absolute", top: "730%", left: 34 }}>
+        <Text style={{ fontSize: 14 }}>Don't have an account?</Text>
+        <TouchableOpacity>
+          <Text style={{ color: "orange", fontWeight: "bold", fontSize: 14 }}>
+            Create one!
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
