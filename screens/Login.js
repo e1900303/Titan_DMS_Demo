@@ -14,16 +14,16 @@ import { Octicons, Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox";
 import SQLite from "react-native-sqlite-storage";
 
-const db = SQLite.openDatabase(
-  {
-    name: "Login_db",
-    location: "default",
-  },
-  () => {},
-  (error) => {
-    console.log(error);
-  }
-);
+// const db = SQLite.openDatabase(
+//   {
+//     name: "Login_db",
+//     location: "default",
+//   },
+//   () => {},
+//   (error) => {
+//     console.log(error);
+//   }
+// );
 
 import { useTogglePasswordVisibility } from "./useTogglePasswordVisibility";
 
@@ -34,53 +34,56 @@ const Login = () => {
   const [password, setPassword] = React.useState("");
   const [username, setUsername] = React.useState("");
 
-  useEffect(() => {
-    createTable();
-    getData();
-  }, []);
+  // useEffect(() => {
+  //   createTable();
+  //   getData();
+  // }, []);
 
-  const createTable = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        "CREATE TABLE IF NOT EXISTS" +
-          "Users" +
-          "(ID INTEGER PRIMARY KEY AUTOINCREMENT, Username TEXT, Password TEXT);"
-      );
-    });
-  };
+  // const createTable = () => {
+  //   db.transaction((tx) => {
+  //     tx.executeSql(
+  //       "CREATE TABLE IF NOT EXISTS" +
+  //         "Users" +
+  //         "(ID INTEGER PRIMARY KEY AUTOINCREMENT, Username TEXT, Password TEXT);"
+  //     );
+  //   });
+  // };
 
-  const getData = () => {
-    try {
-      db.transaction((tx) => {
-        tx.executeSql("SELECT Name, Password FROM Users", [], (tx, results) => {
-          var len = results.rows.length;
-          if (len > 0) {
-            navigation.navigate("Home");
-          }
-        });
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getData = () => {
+  //   try {
+  //     db.transaction((tx) => {
+  //       tx.executeSql("SELECT Name, Password FROM Users", [], (tx, results) => {
+  //         var len = results.rows.length;
+  //         if (len > 0) {
+  //           var username = results.rows.item(0).Name;
+  //           var password = results.rows.item(0).Password;
+  //           setName(username);
+  //           setPassword(password);
+  //         }
+  //       });
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  const setData = async () => {
-    if (username.length == 0 || password.length == 0) {
-      Alert.alert("Warning!", "Please write your data.");
-    } else {
-      try {
-        await db.transaction(async (tx) => {
-          await tx.executeSql("INSERT INTO Users (Name, Age) VALUES (?,?)", [
-            name,
-            age,
-          ]);
-        });
-        navigation.navigate("Home");
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
+  // const setData = async () => {
+  //   if (username.length == 0 || password.length == 0) {
+  //     Alert.alert("Warning!", "Please write your data.");
+  //   } else {
+  //     try {
+  //       await db.transaction(async (tx) => {
+  //         await tx.executeSql("INSERT INTO Users (Name, Password) VALUES (?,?)", [
+  //           username,
+  //           password,
+  //         ]);
+  //       });
+  //       // navigation.navigate("Home");
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   }
+  // };
 
   return (
     <View

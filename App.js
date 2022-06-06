@@ -1,12 +1,10 @@
 import { StatusBar } from "expo-status-bar";
 import react from "react";
 import { StyleSheet, Text, View } from "react-native";
-import Signup from "./screens/Signup";
-
-import Login from "./screens/Login";
+import RootStack from "./navigators/RootStack";
 
 export default function App() {
-  return <Login />;
+  return <RootStack />;
 }
 
 const styles = StyleSheet.create({
