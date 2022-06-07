@@ -45,6 +45,7 @@ export function getUser(email, callback) {
       "select * from Users where email=?",
       [email],
       (transact, resultset) => {
+        console.log(resultset);
         callback(resultset.rows._array[0]);
       },
       (transact, err) => console.log("function getUser", err)
@@ -52,15 +53,15 @@ export function getUser(email, callback) {
   });
 }
 
-export function getUsers(callback) {
-  db.transaction((trx) => {
-    let trxQuery = trx.executeSql(
-      "select * from Users;",
-      [],
-      (transact, resultset) => {
-        callback(resultset.rows._array[0]);
-      },
-      (transact, err) => console.log("function getUsers", err)
-    );
-  });
-}
+// export function getUsers(callback) {
+//   db.transaction((trx) => {
+//     let trxQuery = trx.executeSql(
+//       "select * from Users;",
+//       [],
+//       (transact, resultset) => {
+//         callback(resultset.rows._array[0]);
+//       },
+//       (transact, err) => console.log("function getUsers", err)
+//     );
+//   });
+// }

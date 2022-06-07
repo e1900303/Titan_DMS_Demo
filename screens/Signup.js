@@ -12,10 +12,10 @@ import { Formik } from "formik";
 import { Octicons, Ionicons } from "@expo/vector-icons";
 import initDB from "../components/initDB";
 import { useTogglePasswordVisibility } from "./useTogglePasswordVisibility";
-import { insertUser, getUser } from "../components/initDB";
+import { insertUser } from "../components/initDB";
 import KeyboardAvoidingWrapper from "../components/KeyboardAvoidingWrapper";
 
-const Signup = () => {
+const Signup = ({ navigation }) => {
   const { passwordVisibility, handlePasswordVisibility, rightIcon } =
     useTogglePasswordVisibility();
   const [password, setPassword] = React.useState("");
@@ -45,7 +45,7 @@ const Signup = () => {
       <View
         style={{
           flex: 1,
-          paddingBottom: 1500,
+          paddingBottom: 400,
           paddingHorizontal: 10,
         }}
       >
@@ -252,6 +252,7 @@ const Signup = () => {
               <TouchableOpacity
                 onPress={(value) => {
                   signUp(value);
+                  navigation.navigate("Login");
                 }}
                 // onPress={handleSubmit}
                 style={styles.button}
@@ -278,7 +279,7 @@ const Signup = () => {
           }}
         >
           <Text style={{ fontSize: 15 }}>Already have an account? </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
             <Text style={{ color: "orange", fontWeight: "bold", fontSize: 15 }}>
               Login now!
             </Text>
