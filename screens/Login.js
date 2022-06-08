@@ -29,7 +29,7 @@ import { useTogglePasswordVisibility } from "./useTogglePasswordVisibility";
 import KeyboardAvoidingWrapper from "../components/KeyboardAvoidingWrapper";
 import SQLite from "react-native-sqlite-storage";
 
-const db = SQLite.openDatabase("USER DATA");
+// const db = SQLite.openDatabase("USER DATA");
 
 const Login = ({ navigation }) => {
   const { passwordVisibility, handlePasswordVisibility, rightIcon } =
@@ -89,9 +89,15 @@ const Login = ({ navigation }) => {
   //   }
   // };
 
-  const userValidator = (value) => {
+  const userValidator = () => {
     console.log(`email: ${email} password :${password}`);
-    getUser(value.email, callback);
+    getUser(email, password, (resultset) => {
+      if (resultset) {
+        navigation.navigate("Welcome");
+      } else {
+        Alert.alert("Wrong user name or password!");
+      }
+    });
   };
 
   return (

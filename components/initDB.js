@@ -39,11 +39,11 @@ export function insertUser(email, full_name, password) {
   });
 }
 
-export function getUser(email, callback) {
+export function getUser(email, password, callback) {
   db.transaction((trx) => {
     let trxQuery = trx.executeSql(
-      "select * from Users where email=?",
-      [email],
+      "select * from Users where email=? and password=?",
+      [email, password],
       (transact, resultset) => {
         console.log(resultset);
         callback(resultset.rows._array[0]);
